@@ -130,24 +130,23 @@ Check a box when a chunk is merged and its checkpoint passes.
 > Goal: get Rescale into people's hands. No Apple Developer Program needed —
 > distribute via GitHub Releases, a landing page, and community channels.
 
-- [ ] **3.1 — Release on tags**
+- [x] **3.1 — Release on tags**
   - A second GitHub Actions workflow: on a `v*` tag, build the `.app` bundle →
     zip → attach to a GitHub Release. Include Gatekeeper instructions in the
-    release notes (right-click → Open for unsigned apps).
+    release notes.
   - *Learn:* tag-triggered workflows, `permissions: contents: write`, release
     actions, semantic version tags, the `make-app.sh` → zip → upload pipeline.
   - *Checkpoint:* `git tag v0.1.0 && git push --tags` produces a downloadable
     release on GitHub with a zip of `Rescale.app`.
 
-- [ ] **3.2 — App icon**
-  - Replace the SF Symbol menu bar icon placeholder with a real app icon
-    (1024×1024 `.icns` in the bundle). The menu bar icon (status item) can
-    stay as an SF Symbol — this is for the app icon shown in Finder, Activity
-    Monitor, and the About dialog.
-  - *Learn:* `.icns` format, `iconutil`, adding `CFBundleIconFile` to
-    `Info.plist`.
-  - *Checkpoint:* `Rescale.app` shows a custom icon in Finder instead of the
-    generic app icon.
+- [x] **3.2 — App icon & menu bar icon**
+  - Added Rr brand mark as the app icon (1024×1024 `.icns` in the bundle) and
+    replaced the SF Symbol menu bar icon with a custom scale-arrows template
+    image. Source assets kept in `Design/` folder.
+  - *Learn:* `.icns` format, `iconutil`, `CFBundleIconFile` in `Info.plist`,
+    SPM resource bundling, `NSImage.isTemplate` for menu bar icons.
+  - *Checkpoint:* `Rescale.app` shows the Rr icon in Finder and the scale
+    arrows in the menu bar.
 
 - [ ] **3.3 — Landing page**
   - A single-page site on GitHub Pages: screenshot, what it does, download link
