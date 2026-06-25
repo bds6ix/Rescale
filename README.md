@@ -1,4 +1,4 @@
-# Rescale
+<h1><img src="docs/images/app-icon.png" alt="Rescale icon" width="48" style="vertical-align: middle;"> Rescale</h1>
 
 **The missing menu for display scaling.**
 
