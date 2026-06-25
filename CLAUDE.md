@@ -1,9 +1,14 @@
-# CLAUDE.md — ScaleBar
+# CLAUDE.md — Rescale
 
 ## What this is
 
 A macOS menu bar app (Swift, SPM) that lets you switch display scaling via a
 dropdown — the same "Larger Text ↔ More Space" options from System Settings.
+
+- Tagline: "The missing menu for display scaling."
+- Short description: "Quick-switch display scaling from the macOS menu bar."
+- URL scheme (future): `rescale://`
+- Bundle ID: `com.github.bds6ix.rescale`
 
 ## Build commands
 
@@ -17,7 +22,9 @@ swift build -c release   # optimized build
 ## Architecture
 
 - **`main.swift`** — app lifecycle, menu bar UI, `NSStatusItem` setup.
-  `AppDelegate` owns the menu and rebuilds it via `rebuildMenu()`.
+  `AppDelegate` owns the menu and rebuilds it via `rebuildMenu()`. Implements
+  `NSMenuDelegate` for live refresh on every menu open. Handles resolution
+  switching, Option-click favorites, and Show All / Favorites Only toggles.
 - **`DisplayManager.swift`** — all display/resolution logic. Uses CoreGraphics
   (`CGGetActiveDisplayList`, `CGDisplayCopyAllDisplayModes`) to enumerate
   displays and their HiDPI modes. Filtering rules are documented in
@@ -36,15 +43,32 @@ swift build -c release   # optimized build
   The code also sets `.accessory` activation policy as a belt-and-suspenders
   measure.
 - The `.app` bundle is just `Contents/MacOS/<binary>` + `Contents/Info.plist`.
+- Favorites stored in `UserDefaults` keyed by `"favorites"`, each entry is
+  `"displayID:widthxheight"`.
+
+## Features implemented
+
+- Display enumeration with human-readable names via NSScreen
+- HiDPI mode filtering: aspect ratio match + half-native floor (monitor-agnostic)
+- Resolution switching via CGDisplayConfiguration transaction
+- Checkmark on active resolution
+- Live menu refresh via NSMenuDelegate.menuWillOpen
+- Orientation icons (filled SF Symbol rectangles) on display names
+- Show All Resolutions toggle (bypasses filtering)
+- Favorites: Option-click to star, Favorites Only toggle, UserDefaults persistence
+- "No displays found" empty state
 
 ## Development workflow
 
-- One chunk per branch per PR. Branch naming: `chunk-X.Y-short-description`.
+- One chunk per branch per PR. Branch naming: `chunk-X.Y-short-description`
+  or `fix/short-description` for bug fixes.
 - Squash and merge all PRs.
 - CI runs `swift build` on `macos-15` for every push and PR.
 - Design decisions are recorded as ADRs in `docs/adr/`.
+- Brian runs all git/gh commands himself (learning the workflow).
 
 ## Plan
 
-Implementation follows the phased plan in the parent directory's `PLAN.md`.
-Current progress: Phase 1 (display engine) in progress.
+See `PLAN.md` in this directory. Phases 0–2 complete. Phase 3 (release &
+distribute) is next. Future phases (scriptability, Stream Deck, advanced UI)
+are parked.
