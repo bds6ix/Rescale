@@ -26,7 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "display", accessibilityDescription: "ScaleBar")
+            button.image = NSImage(systemSymbolName: "display", accessibilityDescription: "Rescale")
         }
 
         let menu = NSMenu()
@@ -138,7 +138,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(
             NSMenuItem(
-                title: "Quit ScaleBar",
+                title: "Quit Rescale",
                 action: #selector(NSApplication.terminate(_:)),
                 keyEquivalent: "q"
             )

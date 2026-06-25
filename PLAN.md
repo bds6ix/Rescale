@@ -1,4 +1,4 @@
-# ScaleBar — Implementation Plan
+# Rescale — Implementation Plan
 
 A learning-oriented build plan for a tiny macOS menu bar app that surfaces a display's
 "looks like" scaling options (`Larger Text → More Space`) as a two-click dropdown.
@@ -54,7 +54,7 @@ Check a box when a chunk is merged and its checkpoint passes.
 - [x] **0.2 — The `.app` bundle**
   - Add `Info.plist` (with `LSUIElement`) and `Scripts/make-app.sh` to assemble a real bundle.
   - *Learn:* why a menu bar agent needs a bundle, what `LSUIElement` does, the anatomy of a `.app`.
-  - *Checkpoint:* a double-clickable `ScaleBar.app` that runs with no Dock icon.
+  - *Checkpoint:* a double-clickable `Rescale.app` that runs with no Dock icon.
 
 - [x] **0.3 — Connect to GitHub**
   - Create the empty remote repo, `git remote add origin`, push `main`.
@@ -125,58 +125,100 @@ Check a box when a chunk is merged and its checkpoint passes.
 
 ---
 
-## Phase 3 — Scriptability
+## Phase 3 — Release & distribute
 
-- [ ] **3.1 — The `scalebar://` URL scheme**
-  - Register and handle it so external tools can drive the app.
-  - *Learn:* `CFBundleURLTypes`, `NSAppleEventManager`, `kAEGetURL`, parsing query params.
-  - *Checkpoint:* `open "scalebar://set?display=0&scale=3"` from Terminal switches the resolution.
-  - *Note:* this is the exact hook the Stream Deck plugin (Phase 5) uses — building it here makes
-    Phase 5 self-contained.
+> Goal: get Rescale into people's hands. No Apple Developer Program needed —
+> distribute via GitHub Releases, a landing page, and community channels.
+
+- [ ] **3.1 — Release on tags**
+  - A second GitHub Actions workflow: on a `v*` tag, build the `.app` bundle →
+    zip → attach to a GitHub Release. Include Gatekeeper instructions in the
+    release notes (right-click → Open for unsigned apps).
+  - *Learn:* tag-triggered workflows, `permissions: contents: write`, release
+    actions, semantic version tags, the `make-app.sh` → zip → upload pipeline.
+  - *Checkpoint:* `git tag v0.1.0 && git push --tags` produces a downloadable
+    release on GitHub with a zip of `Rescale.app`.
+
+- [ ] **3.2 — App icon**
+  - Replace the SF Symbol menu bar icon placeholder with a real app icon
+    (1024×1024 `.icns` in the bundle). The menu bar icon (status item) can
+    stay as an SF Symbol — this is for the app icon shown in Finder, Activity
+    Monitor, and the About dialog.
+  - *Learn:* `.icns` format, `iconutil`, adding `CFBundleIconFile` to
+    `Info.plist`.
+  - *Checkpoint:* `Rescale.app` shows a custom icon in Finder instead of the
+    generic app icon.
+
+- [ ] **3.3 — Landing page**
+  - A single-page site on GitHub Pages: screenshot, what it does, download link
+    (pointing to the latest GitHub Release), and a Buy Me a Coffee / Ko-fi tip
+    jar button.
+  - *Learn:* GitHub Pages, static HTML, linking to release assets.
+  - *Checkpoint:* a live URL like `bds6ix.github.io/Rescale` with a working
+    download link.
+
+- [ ] **3.4 — README polish & Gatekeeper instructions**
+  - Update README with: screenshot, installation instructions (including the
+    unsigned app Gatekeeper workaround), link to the landing page, tip jar
+    badge.
+  - *Learn:* README as marketing, badges, screenshot best practices.
+  - *Checkpoint:* a visitor to the GitHub repo can figure out what this is,
+    download it, and run it within 60 seconds.
+
+- [ ] **3.5 — Share it**
+  - Post to r/macapps, r/mac, and any other relevant communities. Optionally
+    list on Product Hunt.
+  - *Learn:* the art of the launch post — what to say, where to post, how to
+    present a side project.
+  - *Checkpoint:* at least one download from someone who isn't you.
 
 ---
 
-## Phase 4 — Release pipeline
+## Future phases *(parked — revisit when motivated)*
 
-- [ ] **4.1 — Release on tags**
-  - A second workflow: on a `v*` tag, build → zip → attach to a GitHub Release.
-  - *Learn:* tag-triggered workflows, `permissions: contents: write`, release actions, semantic
-    version tags.
-  - *Checkpoint:* `git tag v0.1.0 && git push --tags` produces a downloadable release.
+### Scriptability
 
-- [ ] **4.2 — Signing & notarization** *(stretch — only once the app is proven)*
-  - *Learn:* Developer ID identities, repository secrets, `notarytool`, Gatekeeper.
-  - *Cost:* requires the $99/yr Apple Developer account. Park it until you're sure.
+- [ ] **The `rescale://` URL scheme**
+  - Register and handle it so external tools (Stream Deck, Shortcuts, etc.) can
+    drive the app.
+  - *Learn:* `CFBundleURLTypes`, `NSAppleEventManager`, `kAEGetURL`.
 
----
+### Stream Deck plugin *(separate sub-project)*
 
-## Phase 5 — Stream Deck plugin *(separate sub-project)*
+- [ ] **Scaffold** — `streamdeck create` to generate the Node/TypeScript plugin.
+- [ ] **One action** — a single button whose `onKeyDown` runs
+  `open "rescale://set?..."`. Requires the URL scheme above.
+- [ ] **Scale picker** — property inspector to choose display + scale per button.
 
-- [ ] **5.1 — Scaffold** — `streamdeck create` to generate the Node/TypeScript plugin.
-  - *Learn:* plugin architecture (Node backend ↔ Stream Deck over WebSocket), `manifest.json`.
-  - *Requires:* Node.js 24+, Stream Deck 7.1+.
+### Advanced UI
 
-- [ ] **5.2 — One action** — a single button whose `onKeyDown` runs `open "scalebar://set?..."`.
-  - *Learn:* actions, the SDK event model, shelling out from Node.
+- [ ] **Custom `NSPopover` / `NSPanel`** — replace the `NSMenu` dropdown with a
+  custom UI. Enables horizontal layout (like System Settings), richer controls.
+- [ ] **Friendly labels** — "Larger Text" / "More Space" endpoint labels, possibly
+  a scale slider.
 
-- [ ] **5.3 — Scale picker** — multiple actions or a property inspector to choose display + scale.
-  - *Learn:* property inspectors, persisting per-button settings.
+### Signing & notarization *(requires $99/yr Apple Developer Program)*
 
-- [ ] **5.4 — Package & distribute** *(optional)* — bundle the `.streamDeckPlugin`, optionally
-  submit to Marketplace.
+- [ ] **Code signing + notarization** — eliminates the Gatekeeper warning for
+  downloaded apps. Only worth it if you're building more macOS/iOS apps or
+  distributing commercially.
+
+### Distribution extras
+
+- [ ] **Homebrew Cask** — `brew install --cask rescale` for developer-friendly
+  installs.
+- [ ] **Sparkle auto-updates** — notify users when a new version is available.
 
 ---
 
 ## Scope summary
 
-- **Core path:** Phases 0–4. You'll have a working, releasable app before touching Stream Deck.
-- **Polish extras:** Phase 4.2 (notarization) and Phase 5 (Stream Deck plugin).
-- **Rough effort:** Phase 0 is one focused session; Phases 1–3 are a session or two each at a
-  careful review pace.
+- **Core path:** Phases 0–3. A working app, released on GitHub, with a landing
+  page and community launch.
+- **Future:** scriptability, Stream Deck plugin, custom UI, signing — revisit
+  based on interest and traction.
 
 ## Placeholders to replace before publishing
 
-- `com.example.scalebar` → a real bundle ID (e.g. `com.yourname.scalebar`) in `Info.plist`
-- `YOUR_USERNAME` → your GitHub handle in the README clone URL
 - `YOUR NAME` → your name in `LICENSE`
-- Project name `ScaleBar` itself, if you pick a different one
+- Bundle ID `com.github.bds6ix.rescale` is already set in `Info.plist`
